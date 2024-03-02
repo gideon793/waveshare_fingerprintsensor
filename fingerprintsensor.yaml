@@ -16,13 +16,13 @@ ota:
   password: ""
 
 wifi:
-  ssid: "JioFiber-yM8ET"
-  password: "brexit2017"
+  ssid: "*****"
+  password: "*****"
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Fingerprintsensor"
-    password: "baronbegum"
+    password: "*****"
 
 captive_portal:
 
