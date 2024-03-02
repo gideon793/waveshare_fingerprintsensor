@@ -33,7 +33,7 @@ public:
                   uint8_t low = rb[3];
                   uint16_t combine = (high << 8) | low;
                   int users = combine;                  
-                  ESP_LOGI("me", "Matched: %i", users);
+                  ESP_LOGI("WV sensor", "Matched: %i", users);
                   id(door_switch).turn_on();
                   }
             rb.clear();
@@ -50,12 +50,12 @@ public:
             rb.push_back(read());
             }
             if (rb[4]== 0x00){
-                  ESP_LOGI("me", "ACK_SUCCESS");
+                  ESP_LOGI("WV sensor", "ACK_SUCCESS");
                   uint8_t high = rb[2];
                   uint8_t low = rb[3];
                   uint16_t combine = (high << 8) | low;
                   int users = combine;
-                  ESP_LOGI("me", "No of users: %i", users);
+                  ESP_LOGI("WV sensor", "No of users: %i", users);
             }
             rb.clear();
             id(enable).turn_off();
@@ -72,7 +72,7 @@ public:
             }
             std::string hexstring{rb.begin(), rb.end()};
                   int slno = (rb[2]<<16|rb[3]<<8|rb[4]);
-                  ESP_LOGI ("me", "int = %i", slno);
+                  ESP_LOGI ("WV sensor", "int = %i", slno);
             rb.clear();
             id(enable).turn_off();
       }
