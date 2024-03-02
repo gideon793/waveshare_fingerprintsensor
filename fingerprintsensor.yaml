@@ -1,0 +1,134 @@
+esphome:
+  name: fingerprintsensor
+  includes:
+    - wv_fingerprintsensor.h
+   
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+logger:
+  level: VERBOSE
+
+# Enable Home Assistant API
+ota:
+  password: ""
+
+wifi:
+  ssid: "JioFiber-yM8ET"
+  password: "brexit2017"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Fingerprintsensor"
+    password: "baronbegum"
+
+captive_portal:
+
+web_server:
+  port: 80
+
+uart:
+  rx_pin: D6
+  tx_pin: D7
+  baud_rate: 19200
+  id: uart_bus
+  debug:
+    direction: BOTH
+    dummy_receiver: false
+    sequence:     
+      - lambda: |-
+          UARTDebug::log_hex(direction, bytes, ',');       
+
+
+custom_component:
+- lambda: |-
+    wfvpobj = new wvfpsensor(id(uart_bus));
+    return {wfvpobj};
+  components:
+  - id: wfvpobj_1
+    
+button:
+  - platform: template
+    name: "Query no of users"
+    on_press:
+      then:
+        - lambda: wfvpobj->querynousers();
+          #return  {0xF5, 0x26, 00, 00, 00, 00, 0x26, 0xF5};
+  - platform: template
+    name: "Query serial no"
+    on_press:
+      then:
+        lambda: wfvpobj->queryslno();
+  - platform: template
+    name: "Add user"
+    on_press:
+      then: 
+        lambda: wfvpobj-> adduser(id(user_no).state);
+  - platform: template
+    name: "Delete user"
+    on_press:
+      then: 
+        lambda: wfvpobj-> deluser(id(user_no).state);
+  - platform: template
+    name: "Set serial no"
+    on_press:
+      then: 
+        lambda: wfvpobj-> serno(id(serial_no).state);
+
+
+number:
+  - platform: template
+    id: user_no
+    name: "User No"
+    min_value: 1
+    max_value: 100
+    step: 1
+    optimistic: true
+    mode: box
+  - platform: template #set serial no
+    id: serial_no
+    name: "Serial No"
+    min_value: 700
+    max_value: 1000
+    step: 1
+    optimistic: true
+    mode: box
+
+
+binary_sensor:
+  - platform: gpio
+    pin: D2
+    name: "Detect touch"
+    on_press:
+      then: 
+          - switch.turn_on: checkfp
+
+switch:
+  - platform: gpio
+    pin: D3
+    name: "Enable module"
+    id: enable
+  - platform: template
+    name: "Check Fingerprint"
+    id: checkfp
+    turn_on_action: 
+      - lambda: wfvpobj->checkfp();
+  - platform: gpio
+    pin: D5
+    name: "Door Switch"
+    id: door_switch
+    on_turn_on:
+    - delay: 500ms
+    - switch.turn_off: door_switch
+
+
+
+
+text_sensor:
+  - platform: template
+    id: text_string
+
+api:
+  
